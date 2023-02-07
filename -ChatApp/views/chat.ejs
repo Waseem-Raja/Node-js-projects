@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="/public/chat.css">
+</head>
+
+<body>
+
+    <h2>Messenger</h2>
+    <div class="chat-container">
+        <ul class="chat" id="chat1">
+
+
+        </ul>
+        <input type="text" class="text_input" id="clientmsg" placeholder="Message..." />
+    </div>
+    <div> <button id="submit" type="submit">send</button>
+    </div>
+
+    <!-- including socket.io library here -->
+    <script src="socket.io/socket.io.js"></script>
+    <script>
+        const socket = io();
+
+        socket.on('connect', () => {
+            console.log("client connected")
+        })
+
+        let btn = document.getElementById('submit');
+        let clientmsg = document.getElementById('clientmsg');
+        let showclientmsg = document.getElementById('showclientmsg');
+        let showservermsg = document.getElementById('showservermsg');
+        let containerr = document.getElementById('chat-container');
+        let ul = document.getElementById('chat1');
+
+
+        btn.addEventListener("click", () => {
+
+
+
+            if (clientmsg.value != "") {
+                // sending msgs with event name "message"
+                socket.emit('message', clientmsg.value);
+
+                //adding li containing msg to the frontend ul 
+                let li = document.createElement("li");
+                li.setAttribute("class", "message right");
+                let para = document.createElement("p");
+                para.innerHTML = clientmsg.value;
+                li.appendChild(para);
+                let imgg = document.createElement("img");
+                imgg.setAttribute("class", "logo");
+                imgg.src = "/public/images.jpeg"
+                li.appendChild(imgg);
+                ul.appendChild(li);
+                clientmsg.value = "";
+                // console.log(li);
+
+                
+            }
+            // else {
+            //     alert("you can't send empty messages")
+            // }
+        });
+        //Event listener
+        //receving broadcasting message's
+        socket.on("server", msg => {
+        
+
+            //creating an li element with class message left
+            // and a p tag inside it which will containt he msg
+            //also creating an img tag and appending to the li
+            //then inserting this whole li to the frontend ul
+            let li = document.createElement("li");
+            li.setAttribute("class", "message left");
+            let para = document.createElement("p");
+            para.innerHTML = msg;
+            li.appendChild(para);
+            let imgg = document.createElement("img");
+            imgg.setAttribute("class", "logo");
+            imgg.src = "/public/images.jpeg"
+            li.appendChild(imgg);
+            ul.appendChild(li);
+        })
+
+    </script>
+
+
+</body>
+
+</html>
